@@ -2,7 +2,7 @@
 
 describe('Criando cenário de teste para o site GlobalsQA', () => {
 
-  it.skip('Caso de teste: Registrando um usuário no site com sucesso.', () => {
+  it('Caso de teste: Registrando um usuário no site com sucesso.', () => {
     cy.visit('https://globalsqa.com/angularJs-protractor/registration-login-example/#/login')
     cy.get('.btn-link').click()
     cy.get('#firstName').type('Barbara')
@@ -13,7 +13,7 @@ describe('Criando cenário de teste para o site GlobalsQA', () => {
     cy.get('.ng-binding').should('contain.text', 'Registration successful')
   })
 
-  it.skip('Caso de teste: Registrando um usuário no site com falha (faltando senha).', () => {
+  it('Caso de teste: Registrando um usuário no site com falha (faltando senha).', () => {
     cy.visit('https://globalsqa.com/angularJs-protractor/registration-login-example/#/register')
     cy.get('#firstName').type('Barbara')
     cy.get('#Text1').type('Barbieri')
@@ -26,10 +26,20 @@ describe('Criando cenário de teste para o site GlobalsQA', () => {
 
   it('Caso de teste: Realizando um login com sucesso.', () => {
     let user = createUser()
-    cy.get('#username').type(user.id)
+    cy.get('#username').type(user.username)
     cy.get('#password').type(user.password)
     cy.get('.btn-primary').click()
-    cy.get('h1.ng-binding').should('contain.text', user.id)
+    cy.get('h1.ng-binding').should('contain.text', user.username)
+  })
+
+  it('Caso de teste: Deletando um usuário com sucesso.', () => {
+    let { username, password } = createUser()
+    cy.login(username, password)
+    cy.get('h1.ng-binding').should('contain.text', username)
+    cy.get('.ng-binding > a').click()
+    cy.get('.btn').click()
+    cy.login(username, password)
+    cy.get('.ng-binding').should('have.text', 'Username or password is incorrect')
   })
 
 })
@@ -39,19 +49,21 @@ function createUser() {
   let minutes = new Date().getMinutes().toString()
   let seconds = new Date().getSeconds().toString()
 
-  let id = hours + minutes + seconds + 'id'
+  let username = hours + minutes + seconds + 'username'
   let password = hours + minutes + seconds + 'password'
 
-  let user = { 'id': id, 'password': password }
+  let user = { 'username': username, 'password': password }
 
   cy.visit('https://globalsqa.com/angularJs-protractor/registration-login-example/#/login')
   cy.get('.btn-link').click()
-  cy.get('#firstName').type(id)
-  cy.get('#Text1').type(id)
-  cy.get('#username').type(id)
+  cy.get('#firstName').type(username)
+  cy.get('#Text1').type(username)
+  cy.get('#username').type(username)
   cy.get('#password').type(password)
   cy.get('.btn-primary').click()
   cy.get('.ng-binding').should('contain.text', 'Registration successful')
 
   return user
 }
+
+
